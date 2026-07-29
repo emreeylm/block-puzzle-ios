@@ -1,0 +1,14 @@
+.DS_Store
+
+# Xcode
+build/
+DerivedData/
+xcuserdata/
+*.xcuserstate
+
+# SwiftPM
+.build/
+.swiftpm/
+
+# XcodeGen project.yml'den üretir: xcodegen generate
+BlockPuzzle.xcodeproj/
