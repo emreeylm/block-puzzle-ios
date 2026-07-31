@@ -5,7 +5,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/platform-iOS%2017%2B-000000?style=flat-square" alt="iOS 17+">
   <img src="https://img.shields.io/badge/Swift-5.10-F05138?style=flat-square" alt="Swift 5.10">
-  <img src="https://img.shields.io/badge/tests-54%20passing-2EA043?style=flat-square" alt="54 test">
+  <img src="https://img.shields.io/badge/tests-56%20passing-2EA043?style=flat-square" alt="56 test">
   <img src="https://img.shields.io/badge/dependencies-0-0969DA?style=flat-square" alt="Sıfır bağımlılık">
 </p>
 
@@ -22,7 +22,7 @@ Her turda elinize üç parça gelir; bunları ızgaraya yerleştirirsiniz. Bir s
 | Parça yerleştirme | hücre başına 10 |
 | Satır/sütun temizleme | `100 × satırSayısı² × komboSerisi` |
 
-Aynı hamlede iki çizgi patlatmak 400 puan (100 × 2²), üst üste patlatmak ise seriyi katlar. Kombo zinciri, temizleme yapmayan bir hamlede sıfırlanır.
+Aynı hamlede iki çizgi patlatmak 400 puan (100 × 2²), üst üste patlatmak ise seriyi katlar. Kombo zinciri, patlatmayan bir hamlede kırılır — ancak oyunun başında "kombo affı" devrede olduğu için iki boş hamleye kadar dayanır.
 
 **Ekonomi**
 
@@ -32,20 +32,22 @@ Aynı hamlede iki çizgi patlatmak 400 puan (100 × 2²), üst üste patlatmak i
 
 ## Zorluk eğrisi
 
-Oyun ilk dakikalarda cömerttir, oyun uzadıkça sertleşir. Dört mekanik **yerleştirilen parça sayısıyla** kayar (`DifficultyCurve`, 0 → 250 hamle aralığında). İlerlemeyi skora değil hamleye bağlamak bilinçli: skor tabanlıyken tek bir büyük kombo oyuncuyu aniden ileri zorluğa fırlatıyordu.
+Oyun ilk dakikalarda cömerttir, oyun uzadıkça sertleşir. Beş mekanik **yerleştirilen parça sayısıyla** kayar (`DifficultyCurve`, 0 → 350 hamle aralığında). İlerlemeyi skora değil hamleye bağlamak bilinçli: skor tabanlıyken tek bir büyük kombo oyuncuyu aniden ileri zorluğa fırlatıyordu.
 
 | Mekanik | Başlangıç | Tavan |
 |---|---|---|
 | Ele patlatmaya hazır parça ekleme | %100 | %6 |
 | Büyük parçanın geometrik eşini verme | %100 | %35 |
-| Hantal parça ağırlığı (büyük L, 2×3, 3×3) | 0.03× | 1.6× |
+| Hantal parça ağırlığı (büyük L, 2×3, 3×3, artı) | 0× (hiç yok) | 1.6× |
+| Kombo affı (seriyi koruyan boş hamle) | 2 hamle | 0 |
 | El garantisi | 3 parça da sığar | 1 parça sığar |
 
-Ölçülen parça dağılımı: açılışta parçaların **%74'ü orta boy** (3–4 hücre) ve yalnızca **%1'i hantal**; sonda hantal parça oranı **%38'e** çıkar. Düz çizgiler "hantal" sayılmaz — 5'li çizgi beş hücre olmasına rağmen satır doldurmanın en kolay yoludur, bu yüzden her aşamada bulunur.
+Ölçülen parça dağılımı: açılışta parçaların **%74'ü orta boy** (3–4 hücre) ve **hiç hantal parça yok**; sonda hantal parça oranı **%38'e** çıkar. Düz çizgiler "hantal" sayılmaz — 5'li çizgi beş hücre olmasına rağmen satır doldurmanın en kolay yoludur, bu yüzden her aşamada bulunur.
 
-İki mekanik oyuncuya görünmez şekilde yardım eder:
+Üç mekanik oyuncuya görünmez şekilde yardım eder:
 
 - **Kombo yardımcısı** — elde çizgi tamamlayabilecek parça yoksa, şans tutarsa bir tane eklenir
+- **Kombo affı** — kombo serisi, oyunun başında patlatmayan iki hamleye kadar dayanır; ilerledikçe af sıfıra iner ve seri tek boş hamlede kırılır. 200 oyunluk simülasyonda ilk 40 hamledeki kombo sayısını 3,2'den 14,1'e çıkarıyor
 - **Uyum** — ele büyük bir parça düştüğünde geometrik eşi de gelir (büyük L + 2×2 = tam 3×3; 5'li çizgi + 3'lü çizgi = tam satır). Eş parça tahtaya sığmıyorsa mekanik devreye girmez, aksi halde oynanabilir bir parçanın üzerine yazıp oyunu haksız yere bitirebilir.
 
 Ayrıca her el yenilendiğinde motor **en az bir parçanın sığdığını garanti eder**; sıkışık tahtada gerekirse ele sığabilen en küçük parça konur. Oyun ancak gerçekten hamle kalmadığında biter.
@@ -118,7 +120,7 @@ Dosya ekleyip çıkardıktan sonra `xcodegen generate` komutunu yeniden çalış
 cd GameCore && swift test
 ```
 
-54 test; tahta mantığı, puanlama, kombo, ekonomi, skin sahipliği, parça dağılımı ve zorluk eğrisini kapsar. Testler Xcode gerektirmez — komut satırında saniyeler içinde çalışır.
+56 test; tahta mantığı, puanlama, kombo, ekonomi, skin sahipliği, parça dağılımı ve zorluk eğrisini kapsar. Testler Xcode gerektirmez — komut satırında saniyeler içinde çalışır.
 
 ### Geliştirme kısayolları
 

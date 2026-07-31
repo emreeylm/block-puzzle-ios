@@ -66,7 +66,11 @@ final class GameEngineTests: XCTestCase {
             board[GridPoint(x: x, y: 1)] = 0
         }
         let piece = Piece(shape: single, colorIndex: 0)
-        let engine = GameEngine(board: board, hand: [piece, piece, piece])
+        let engine = GameEngine(
+            board: board,
+            hand: [piece, piece, piece],
+            difficulty: DifficultyCurve(comboGraceStart: 0, comboGraceEnd: 0)
+        )
 
         // 1. temizleme: streak 1 → 10 + 100*1*1*1 = 110
         engine.place(handIndex: 0, at: GridPoint(x: 7, y: 0))
@@ -329,6 +333,55 @@ final class GameEngineTests: XCTestCase {
                 "Seed \(seed): yenilenen elde tekrar eden renk var → \(colors)"
             )
         }
+    }
+
+    /// Kombo affı: oyunun başında seri, patlatmayan hamlelerde hemen kırılmaz.
+    func testComboGraceKeepsStreakAlive() {
+        var board = GameBoard()
+        // 0. ve 1. satırlar tek hücre eksik
+        for x in 0..<7 {
+            board[GridPoint(x: x, y: 0)] = 0
+            board[GridPoint(x: x, y: 1)] = 0
+        }
+        let piece = Piece(shape: single, colorIndex: 0)
+        let engine = GameEngine(
+            board: board,
+            hand: [piece, piece, piece],
+            difficulty: DifficultyCurve(comboGraceStart: 2, comboGraceEnd: 2)
+        )
+
+        engine.place(handIndex: 0, at: GridPoint(x: 7, y: 0))
+        XCTAssertEqual(engine.comboStreak, 1)
+
+        // Patlatmayan hamle: af sayesinde seri korunur
+        engine.place(handIndex: 1, at: GridPoint(x: 3, y: 5))
+        XCTAssertEqual(engine.comboStreak, 1, "Af varken seri tek boş hamlede kırılmamalı")
+
+        // Sonraki patlatma seriyi 2'ye çıkarır: 10 + 100 * 1² * 2 = 210
+        let outcome = engine.place(handIndex: 2, at: GridPoint(x: 7, y: 1))
+        XCTAssertEqual(engine.comboStreak, 2)
+        XCTAssertEqual(outcome?.clearPoints, 200)
+    }
+
+    func testComboGraceExpiresAfterLimit() {
+        var board = GameBoard()
+        for x in 0..<7 { board[GridPoint(x: x, y: 0)] = 0 }
+        let piece = Piece(shape: single, colorIndex: 0)
+        let engine = GameEngine(
+            board: board,
+            hand: Array(repeating: Piece(shape: single, colorIndex: 0), count: 4),
+            difficulty: DifficultyCurve(comboGraceStart: 1, comboGraceEnd: 1)
+        )
+        _ = piece
+
+        engine.place(handIndex: 0, at: GridPoint(x: 7, y: 0))
+        XCTAssertEqual(engine.comboStreak, 1)
+
+        engine.place(handIndex: 1, at: GridPoint(x: 2, y: 5))   // 1. boş hamle: affedilir
+        XCTAssertEqual(engine.comboStreak, 1)
+
+        engine.place(handIndex: 2, at: GridPoint(x: 4, y: 5))   // 2. boş hamle: af biter
+        XCTAssertEqual(engine.comboStreak, 0)
     }
 
     func testComplementMapping() {

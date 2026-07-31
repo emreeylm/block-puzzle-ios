@@ -33,6 +33,9 @@ public final class GameEngine {
     /// Yerleştirilen toplam parça sayısı. Zorluk ilerlemesi buna bağlıdır.
     public private(set) var placementCount = 0
 
+    /// Seri kesilmeden kaç patlatmayan hamle yapıldığı (kombo affı sayacı).
+    private var missedClears = 0
+
     public let handSize: Int
     public let colorCount: Int
     /// Zorluk eğrisi: skor arttıkça yardımcı mekanikler kısılır, parçalar sertleşir.
@@ -135,8 +138,20 @@ public final class GameEngine {
         board.clear(rows: rows, columns: columns)
 
         let lineCount = rows.count + columns.count
-        comboStreak = lineCount > 0 ? comboStreak + 1 : 0
         placementCount += 1
+
+        // Kombo affı: oyunun başında seri, patlatmayan birkaç hamleye dayanır.
+        // Zorluk ilerledikçe af sıfıra iner ve seri tek boş hamlede kırılır.
+        if lineCount > 0 {
+            comboStreak += 1
+            missedClears = 0
+        } else if comboStreak > 0 {
+            missedClears += 1
+            if missedClears > difficulty.comboGrace(at: difficultyProgress) {
+                comboStreak = 0
+                missedClears = 0
+            }
+        }
 
         let placementPoints = piece.shape.cellCount * GameEngine.placementPointsPerCell
         let clearPoints = lineCount > 0

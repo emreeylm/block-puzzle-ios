@@ -24,17 +24,24 @@ public struct DifficultyCurve: Equatable {
     public var hardShapeMultiplierStart: Double
     public var hardShapeMultiplierEnd: Double
 
+    /// Kombo serisinin hayatta kalabileceği, patlatmayan hamle sayısı
+    /// (başlangıç → tavan). Oyunun başında zincir kurmayı kolaylaştırır.
+    public var comboGraceStart: Int
+    public var comboGraceEnd: Int
+
     /// Bu ilerlemeye kadar el garantisi "üç parça da oynanabilir" hedefiyle başlar.
     public var fullHandGuaranteeUntil: Double
 
     public init(
-        rampMoves: Int = 250,
+        rampMoves: Int = 350,
         comboHelperStart: Double = 1.0,
         comboHelperEnd: Double = 0.06,
         harmonyStart: Double = 1.0,
         harmonyEnd: Double = 0.35,
-        hardShapeMultiplierStart: Double = 0.03,
+        hardShapeMultiplierStart: Double = 0.0,
         hardShapeMultiplierEnd: Double = 1.6,
+        comboGraceStart: Int = 2,
+        comboGraceEnd: Int = 0,
         fullHandGuaranteeUntil: Double = 0.85
     ) {
         self.rampMoves = rampMoves
@@ -44,6 +51,8 @@ public struct DifficultyCurve: Equatable {
         self.harmonyEnd = harmonyEnd
         self.hardShapeMultiplierStart = hardShapeMultiplierStart
         self.hardShapeMultiplierEnd = hardShapeMultiplierEnd
+        self.comboGraceStart = comboGraceStart
+        self.comboGraceEnd = comboGraceEnd
         self.fullHandGuaranteeUntil = fullHandGuaranteeUntil
     }
 
@@ -65,6 +74,11 @@ public struct DifficultyCurve: Equatable {
 
     public func hardShapeMultiplier(at progress: Double) -> Double {
         interpolate(hardShapeMultiplierStart, hardShapeMultiplierEnd, progress)
+    }
+
+    /// Kombo serisi bu kadar patlatmayan hamleye kadar hayatta kalır.
+    public func comboGrace(at progress: Double) -> Int {
+        Int(interpolate(Double(comboGraceStart), Double(comboGraceEnd), progress).rounded())
     }
 
     /// El dağıtılırken sırayla denenecek "kaç parça oynanabilir olsun" hedefleri.
