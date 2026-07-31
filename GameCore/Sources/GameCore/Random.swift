@@ -51,9 +51,18 @@ public struct PieceGenerator {
     /// Bu hücre sayısından itibaren şekil "zor" sayılır ve zorluk eğrisiyle ölçeklenir.
     static let hardShapeCellThreshold = 5
 
+    /// Zor = büyük **ve** hantal. Düz çizgiler bunun dışındadır: 5'li çizgi
+    /// beş hücre olmasına rağmen satır doldurmanın en kolay yoludur, onu
+    /// bastırmak oyunu kolaylaştırmaz, zorlaştırır. Asıl hantal olanlar
+    /// büyük L, 2x3 dikdörtgen ve 3x3 karedir.
+    private static func isHard(_ shape: PieceShape) -> Bool {
+        let isStraightLine = shape.width == 1 || shape.height == 1
+        return shape.cellCount >= hardShapeCellThreshold && !isStraightLine
+    }
+
     private static let weightedShapes: [(shape: PieceShape, weight: Int, isHard: Bool)] =
         PieceCatalog.allShapes.map {
-            ($0, weightsByShape[$0] ?? 3, $0.cellCount >= hardShapeCellThreshold)
+            ($0, weightsByShape[$0] ?? 3, isHard($0))
         }
 
     private var rng: any RandomNumberGenerator

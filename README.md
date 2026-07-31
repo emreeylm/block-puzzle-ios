@@ -32,16 +32,16 @@ Aynı hamlede iki çizgi patlatmak 400 puan (100 × 2²), üst üste patlatmak i
 
 ## Zorluk eğrisi
 
-Oyun ilk dakikalarda cömerttir, oyun uzadıkça sertleşir. Dört mekanik **yerleştirilen parça sayısıyla** kayar (`DifficultyCurve`, 0 → 150 hamle aralığında). İlerlemeyi skora değil hamleye bağlamak bilinçli: skor tabanlıyken tek bir büyük kombo oyuncuyu aniden ileri zorluğa fırlatıyordu.
+Oyun ilk dakikalarda cömerttir, oyun uzadıkça sertleşir. Dört mekanik **yerleştirilen parça sayısıyla** kayar (`DifficultyCurve`, 0 → 250 hamle aralığında). İlerlemeyi skora değil hamleye bağlamak bilinçli: skor tabanlıyken tek bir büyük kombo oyuncuyu aniden ileri zorluğa fırlatıyordu.
 
 | Mekanik | Başlangıç | Tavan |
 |---|---|---|
-| Ele patlatmaya hazır parça ekleme | %85 | %6 |
+| Ele patlatmaya hazır parça ekleme | %100 | %6 |
 | Büyük parçanın geometrik eşini verme | %100 | %35 |
-| Zor (5+ hücreli) parça ağırlığı | 0.10× | 1.6× |
+| Hantal parça ağırlığı (büyük L, 2×3, 3×3) | 0.03× | 1.6× |
 | El garantisi | 3 parça da sığar | 1 parça sığar |
 
-Ölçülen parça dağılımı: açılışta parçaların **%82'si orta boy** (3–4 hücre) ve yalnızca %5'i dev; sonda dev parça oranı **%50'ye** çıkar.
+Ölçülen parça dağılımı: açılışta parçaların **%74'ü orta boy** (3–4 hücre) ve yalnızca **%1'i hantal**; sonda hantal parça oranı **%38'e** çıkar. Düz çizgiler "hantal" sayılmaz — 5'li çizgi beş hücre olmasına rağmen satır doldurmanın en kolay yoludur, bu yüzden her aşamada bulunur.
 
 İki mekanik oyuncuya görünmez şekilde yardım eder:
 

@@ -28,14 +28,14 @@ public struct DifficultyCurve: Equatable {
     public var fullHandGuaranteeUntil: Double
 
     public init(
-        rampMoves: Int = 150,
-        comboHelperStart: Double = 0.85,
+        rampMoves: Int = 250,
+        comboHelperStart: Double = 1.0,
         comboHelperEnd: Double = 0.06,
         harmonyStart: Double = 1.0,
         harmonyEnd: Double = 0.35,
-        hardShapeMultiplierStart: Double = 0.10,
+        hardShapeMultiplierStart: Double = 0.03,
         hardShapeMultiplierEnd: Double = 1.6,
-        fullHandGuaranteeUntil: Double = 0.7
+        fullHandGuaranteeUntil: Double = 0.85
     ) {
         self.rampMoves = rampMoves
         self.comboHelperStart = comboHelperStart
