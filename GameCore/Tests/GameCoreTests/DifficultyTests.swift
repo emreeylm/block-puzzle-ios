@@ -4,12 +4,35 @@ import XCTest
 final class DifficultyTests: XCTestCase {
     private let curve = DifficultyCurve.standard
 
-    func testProgressIsClampedAndScales() {
-        XCTAssertEqual(curve.progress(forScore: 0), 0)
-        XCTAssertEqual(curve.progress(forScore: -100), 0)
-        XCTAssertEqual(curve.progress(forScore: curve.rampScore / 2), 0.5, accuracy: 0.001)
-        XCTAssertEqual(curve.progress(forScore: curve.rampScore), 1)
-        XCTAssertEqual(curve.progress(forScore: curve.rampScore * 10), 1)
+    func testProgressTracksMoves() {
+        XCTAssertEqual(curve.progress(forMoves: 0), 0)
+        XCTAssertEqual(curve.progress(forMoves: -100), 0)
+        XCTAssertEqual(curve.progress(forMoves: curve.rampMoves / 2), 0.5, accuracy: 0.001)
+        XCTAssertEqual(curve.progress(forMoves: curve.rampMoves), 1)
+        XCTAssertEqual(curve.progress(forMoves: curve.rampMoves * 10), 1)
+    }
+
+    /// Zorluk hamle sayısına bağlı: tek bir büyük kombo skoru fırlatsa bile
+    /// ilerleme tek hamlelik kalmalı.
+    func testDifficultyFollowsMovesNotScore() {
+        var board = GameBoard()
+        for x in 1..<8 { board[GridPoint(x: x, y: 0)] = 0 }
+        for y in 1..<8 { board[GridPoint(x: 0, y: y)] = 0 }
+        let engine = GameEngine(
+            board: board,
+            hand: [Piece(shape: PieceCatalog.single, colorIndex: 0)]
+        )
+
+        engine.place(handIndex: 0, at: GridPoint(x: 0, y: 0))
+
+        XCTAssertEqual(engine.score, 410, "İki çizgi patladı: 10 + 100 × 2² × 1")
+        XCTAssertEqual(engine.placementCount, 1)
+        XCTAssertEqual(
+            engine.difficultyProgress,
+            1.0 / Double(curve.rampMoves),
+            accuracy: 0.0001,
+            "410 puanlık kombo zorluğu fırlatmamalı"
+        )
     }
 
     func testHelperMechanicsWeakenAsGameProgresses() {
@@ -52,7 +75,7 @@ final class DifficultyTests: XCTestCase {
         XCTAssertGreaterThan(late, 400, "Sonda zor parçalar baskın olmalı")
     }
 
-    func testEngineTightensWithScore() {
+    func testEngineTightensWithMoves() {
         let engine = GameEngine(seed: 7)
         let startCombo = engine.comboHelperChance
         let startHarmony = engine.harmonyChance

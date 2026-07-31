@@ -30,21 +30,24 @@ public final class GameEngine {
     public private(set) var score = 0
     public private(set) var comboStreak = 0
     public private(set) var isGameOver = false
+    /// Yerleştirilen toplam parça sayısı. Zorluk ilerlemesi buna bağlıdır.
+    public private(set) var placementCount = 0
 
     public let handSize: Int
     public let colorCount: Int
     /// Zorluk eğrisi: skor arttıkça yardımcı mekanikler kısılır, parçalar sertleşir.
     public let difficulty: DifficultyCurve
 
+    /// Yerleştirme puanı: hücre başına `placementPointsPerCell`.
     /// Temizleme puanı: `lineClearBase * satırSayısı² * comboSerisi`.
-    /// Yerleştirme puanı hücre başına 1'dir.
-    private static let lineClearBase = 10
+    private static let placementPointsPerCell = 10
+    private static let lineClearBase = 100
 
     private var generator: PieceGenerator
 
     /// 0 = oyunun başı (kolay), 1 = tam zorluk. UI göstergesi için de kullanılabilir.
     public var difficultyProgress: Double {
-        difficulty.progress(forScore: score)
+        difficulty.progress(forMoves: placementCount)
     }
 
     /// Her el yenilenmesinde, ele "çizgi tamamlayabilen" bir parça koyma olasılığı.
@@ -133,8 +136,9 @@ public final class GameEngine {
 
         let lineCount = rows.count + columns.count
         comboStreak = lineCount > 0 ? comboStreak + 1 : 0
+        placementCount += 1
 
-        let placementPoints = piece.shape.cellCount
+        let placementPoints = piece.shape.cellCount * GameEngine.placementPointsPerCell
         let clearPoints = lineCount > 0
             ? GameEngine.lineClearBase * lineCount * lineCount * max(comboStreak, 1)
             : 0

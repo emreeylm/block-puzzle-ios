@@ -2,12 +2,15 @@ import Foundation
 
 /// Oyun ilerledikçe zorluğun nasıl arttığını tanımlar: başta cömert
 /// (bol kombo fırsatı, birbirini tamamlayan parçalar, garantili oynanabilir el),
-/// skor yükseldikçe sertleşir. Tüm zorluk dengesi bu dosyada toplanır.
+/// oyun uzadıkça sertleşir. Tüm zorluk dengesi bu dosyada toplanır.
 ///
-/// İlerleme skora bağlıdır: `score / rampScore`, 0...1 arasına kırpılır.
+/// İlerleme **yerleştirilen parça sayısına** bağlıdır: `moves / rampMoves`,
+/// 0...1 arasına kırpılır. Skora bağlamak, tek bir büyük kombonun oyuncuyu
+/// aniden ileri zorluğa fırlatmasına yol açıyordu; hamle sayısı oyun süresiyle
+/// orantılı, düzgün bir tempo verir.
 public struct DifficultyCurve: Equatable {
-    /// Bu skora ulaşıldığında zorluk tavana oturur.
-    public var rampScore: Int
+    /// Bu kadar parça yerleştirildiğinde zorluk tavana oturur.
+    public var rampMoves: Int
 
     /// Ele "çizgi tamamlayabilen" parça koyma olasılığı (başlangıç → tavan).
     public var comboHelperStart: Double
@@ -25,7 +28,7 @@ public struct DifficultyCurve: Equatable {
     public var fullHandGuaranteeUntil: Double
 
     public init(
-        rampScore: Int = 6000,
+        rampMoves: Int = 150,
         comboHelperStart: Double = 0.85,
         comboHelperEnd: Double = 0.06,
         harmonyStart: Double = 1.0,
@@ -34,7 +37,7 @@ public struct DifficultyCurve: Equatable {
         hardShapeMultiplierEnd: Double = 1.6,
         fullHandGuaranteeUntil: Double = 0.7
     ) {
-        self.rampScore = rampScore
+        self.rampMoves = rampMoves
         self.comboHelperStart = comboHelperStart
         self.comboHelperEnd = comboHelperEnd
         self.harmonyStart = harmonyStart
@@ -47,9 +50,9 @@ public struct DifficultyCurve: Equatable {
     public static let standard = DifficultyCurve()
 
     /// 0 = oyunun başı, 1 = tam zorluk.
-    public func progress(forScore score: Int) -> Double {
-        guard rampScore > 0 else { return 1 }
-        return min(1, max(0, Double(score) / Double(rampScore)))
+    public func progress(forMoves moves: Int) -> Double {
+        guard rampMoves > 0 else { return 1 }
+        return min(1, max(0, Double(moves) / Double(rampMoves)))
     }
 
     public func comboHelperChance(at progress: Double) -> Double {

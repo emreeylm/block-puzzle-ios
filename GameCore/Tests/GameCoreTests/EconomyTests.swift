@@ -3,12 +3,12 @@ import XCTest
 
 final class EconomyTests: XCTestCase {
     func testCoinConversionRoundsDown() {
-        let config = EconomyConfig(pointsPerCoin: 50)
+        let config = EconomyConfig(pointsPerCoin: 500)
         XCTAssertEqual(config.coins(forScore: 0), 0)
-        XCTAssertEqual(config.coins(forScore: 49), 0)
-        XCTAssertEqual(config.coins(forScore: 50), 1)
-        XCTAssertEqual(config.coins(forScore: 1249), 24)
-        XCTAssertEqual(config.coins(forScore: -10), 0)
+        XCTAssertEqual(config.coins(forScore: 499), 0)
+        XCTAssertEqual(config.coins(forScore: 500), 1)
+        XCTAssertEqual(config.coins(forScore: 12499), 24)
+        XCTAssertEqual(config.coins(forScore: -100), 0)
     }
 
     func testComboBonusOnlyFromSecondStreak() {

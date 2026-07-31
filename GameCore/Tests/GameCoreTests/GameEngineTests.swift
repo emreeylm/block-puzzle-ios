@@ -27,9 +27,9 @@ final class GameEngineTests: XCTestCase {
 
         let outcome = engine.place(handIndex: 0, at: GridPoint(x: 0, y: 0))
         XCTAssertNotNil(outcome)
-        XCTAssertEqual(outcome?.placementPoints, 1)
+        XCTAssertEqual(outcome?.placementPoints, 10)
         XCTAssertEqual(outcome?.clearPoints, 0)
-        XCTAssertEqual(engine.score, 1)
+        XCTAssertEqual(engine.score, 10)
         XCTAssertNil(engine.hand[0])
     }
 
@@ -52,8 +52,8 @@ final class GameEngineTests: XCTestCase {
         let outcome = engine.place(handIndex: 0, at: GridPoint(x: 7, y: 2))
         XCTAssertEqual(outcome?.clearedLineCount, 1)
         XCTAssertEqual(outcome?.comboStreak, 1)
-        // 1 hücre yerleştirme + 10 * 1² * 1 combo = 11
-        XCTAssertEqual(engine.score, 11)
+        // 1 hücre × 10 + 100 * 1² * 1 combo = 110
+        XCTAssertEqual(engine.score, 110)
         XCTAssertEqual(outcome?.clearedCells.count, 8)
         XCTAssertTrue(engine.board.isEmpty)
     }
@@ -68,20 +68,20 @@ final class GameEngineTests: XCTestCase {
         let piece = Piece(shape: single, colorIndex: 0)
         let engine = GameEngine(board: board, hand: [piece, piece, piece])
 
-        // 1. temizleme: streak 1 → 1 + 10*1*1*1 = 11
+        // 1. temizleme: streak 1 → 10 + 100*1*1*1 = 110
         engine.place(handIndex: 0, at: GridPoint(x: 7, y: 0))
         XCTAssertEqual(engine.comboStreak, 1)
-        XCTAssertEqual(engine.score, 11)
+        XCTAssertEqual(engine.score, 110)
 
-        // 2. temizleme: streak 2 → +1 + 10*1*1*2 = +21
+        // 2. temizleme: streak 2 → +10 + 100*1*1*2 = +210
         engine.place(handIndex: 1, at: GridPoint(x: 7, y: 1))
         XCTAssertEqual(engine.comboStreak, 2)
-        XCTAssertEqual(engine.score, 32)
+        XCTAssertEqual(engine.score, 320)
 
         // Temizlemeyen hamle: streak sıfırlanır
         engine.place(handIndex: 2, at: GridPoint(x: 0, y: 5))
         XCTAssertEqual(engine.comboStreak, 0)
-        XCTAssertEqual(engine.score, 33)
+        XCTAssertEqual(engine.score, 330)
     }
 
     func testMultiLineClearBonus() {
@@ -94,8 +94,8 @@ final class GameEngineTests: XCTestCase {
 
         let outcome = engine.place(handIndex: 0, at: GridPoint(x: 0, y: 0))
         XCTAssertEqual(outcome?.clearedLineCount, 2)
-        // 1 + 10 * 2² * 1 = 41
-        XCTAssertEqual(engine.score, 41)
+        // 10 + 100 * 2² * 1 = 410
+        XCTAssertEqual(engine.score, 410)
         // 15 benzersiz hücre temizlendi (8 + 8 - 1 kesişim)
         XCTAssertEqual(outcome?.clearedCells.count, 15)
     }

@@ -6,7 +6,7 @@ public struct EconomyConfig: Equatable {
     /// Peş peşe patlatma (kombo, streak >= 2) başına anında verilen coin.
     public var coinsPerCombo: Int
 
-    public init(pointsPerCoin: Int = 50, coinsPerCombo: Int = 5) {
+    public init(pointsPerCoin: Int = 500, coinsPerCombo: Int = 5) {
         precondition(pointsPerCoin > 0)
         self.pointsPerCoin = pointsPerCoin
         self.coinsPerCombo = coinsPerCombo

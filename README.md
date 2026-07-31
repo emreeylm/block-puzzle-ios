@@ -5,7 +5,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/platform-iOS%2017%2B-000000?style=flat-square" alt="iOS 17+">
   <img src="https://img.shields.io/badge/Swift-5.10-F05138?style=flat-square" alt="Swift 5.10">
-  <img src="https://img.shields.io/badge/tests-53%20passing-2EA043?style=flat-square" alt="53 test">
+  <img src="https://img.shields.io/badge/tests-54%20passing-2EA043?style=flat-square" alt="54 test">
   <img src="https://img.shields.io/badge/dependencies-0-0969DA?style=flat-square" alt="Sıfır bağımlılık">
 </p>
 
@@ -19,20 +19,20 @@ Her turda elinize üç parça gelir; bunları ızgaraya yerleştirirsiniz. Bir s
 
 | Olay | Puan |
 |---|---|
-| Parça yerleştirme | hücre başına 1 |
-| Satır/sütun temizleme | `10 × satırSayısı² × komboSerisi` |
+| Parça yerleştirme | hücre başına 10 |
+| Satır/sütun temizleme | `100 × satırSayısı² × komboSerisi` |
 
-Aynı hamlede iki çizgi patlatmak 40 puan (10 × 2²), üst üste patlatmak ise seriyi katlar. Kombo zinciri, temizleme yapmayan bir hamlede sıfırlanır.
+Aynı hamlede iki çizgi patlatmak 400 puan (100 × 2²), üst üste patlatmak ise seriyi katlar. Kombo zinciri, temizleme yapmayan bir hamlede sıfırlanır.
 
 **Ekonomi**
 
-- Oyun sonunda her 50 puan → 1 coin
+- Oyun sonunda her 500 puan → 1 coin
 - Her kombo patlatması (üst üste 2. temizlemeden itibaren) → anında +5 coin
 - Coinler mağazadaki 14 skin'i açmak için kullanılır
 
 ## Zorluk eğrisi
 
-Oyun ilk dakikalarda cömerttir, skor yükseldikçe sertleşir. Dört mekanik skorla birlikte kayar (`DifficultyCurve`, 0 → 6000 puan aralığında):
+Oyun ilk dakikalarda cömerttir, oyun uzadıkça sertleşir. Dört mekanik **yerleştirilen parça sayısıyla** kayar (`DifficultyCurve`, 0 → 150 hamle aralığında). İlerlemeyi skora değil hamleye bağlamak bilinçli: skor tabanlıyken tek bir büyük kombo oyuncuyu aniden ileri zorluğa fırlatıyordu.
 
 | Mekanik | Başlangıç | Tavan |
 |---|---|---|
@@ -41,7 +41,7 @@ Oyun ilk dakikalarda cömerttir, skor yükseldikçe sertleşir. Dört mekanik sk
 | Zor (5+ hücreli) parça ağırlığı | 0.10× | 1.6× |
 | El garantisi | 3 parça da sığar | 1 parça sığar |
 
-Ölçülen parça dağılımı: açılışta parçaların **%81'i orta boy** (3–4 hücre) ve yalnızca %6'sı dev; sonda dev parça oranı **%50'ye** çıkar.
+Ölçülen parça dağılımı: açılışta parçaların **%82'si orta boy** (3–4 hücre) ve yalnızca %5'i dev; sonda dev parça oranı **%50'ye** çıkar.
 
 İki mekanik oyuncuya görünmez şekilde yardım eder:
 
@@ -118,7 +118,7 @@ Dosya ekleyip çıkardıktan sonra `xcodegen generate` komutunu yeniden çalış
 cd GameCore && swift test
 ```
 
-53 test; tahta mantığı, puanlama, kombo, ekonomi, skin sahipliği, parça dağılımı ve zorluk eğrisini kapsar. Testler Xcode gerektirmez — komut satırında saniyeler içinde çalışır.
+54 test; tahta mantığı, puanlama, kombo, ekonomi, skin sahipliği, parça dağılımı ve zorluk eğrisini kapsar. Testler Xcode gerektirmez — komut satırında saniyeler içinde çalışır.
 
 ### Geliştirme kısayolları
 
