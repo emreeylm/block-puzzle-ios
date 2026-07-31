@@ -140,7 +140,7 @@ Xcode'da `Product → Scheme → Edit Scheme → Run → Arguments` altından ek
 │   ├── Sources/GameCore/
 │   │   ├── GameBoard.swift     ızgara, yerleştirme, çizgi temizleme
 │   │   ├── GameEngine.swift    oturum durumu, skor, kombo, oyun sonu
-│   │   ├── Piece.swift         25 parça şekli ve tamamlayıcı eşleşmeleri
+│   │   ├── Piece.swift         30 parça şekli ve tamamlayıcı eşleşmeleri
 │   │   ├── Random.swift        tohumlanabilir RNG + ağırlıklı üretim
 │   │   ├── Difficulty.swift    zorluk eğrisi
 │   │   ├── Economy.swift       coin dönüşümü ve cüzdan

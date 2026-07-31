@@ -45,6 +45,10 @@ public struct PieceGenerator {
          PieceCatalog.bigLC, PieceCatalog.bigLD].forEach { weights[$0] = 2 }     // aile: 8
         [PieceCatalog.rect2x3, PieceCatalog.rect3x2].forEach { weights[$0] = 4 } // aile: 8
         weights[PieceCatalog.square3] = 6                                   // aile: 6
+        // Zikzaklar boşluk bırakmaya meyillidir; çeşitlilik için var, baskın değil
+        [PieceCatalog.sH, PieceCatalog.sV,
+         PieceCatalog.zH, PieceCatalog.zV].forEach { weights[$0] = 1 }      // aile: 4
+        weights[PieceCatalog.plus] = 5                                      // aile: 5
         return weights
     }()
 

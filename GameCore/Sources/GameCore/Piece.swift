@@ -80,6 +80,15 @@ public enum PieceCatalog {
     public static let bigLC = shape([(0, 2), (1, 2), (2, 2), (0, 0), (0, 1)])
     public static let bigLD = shape([(2, 0), (2, 1), (0, 2), (1, 2), (2, 2)])
 
+    // Zikzak S/Z (4 hücre, 4 yön)
+    public static let sH = shape([(1, 0), (2, 0), (0, 1), (1, 1)])
+    public static let sV = shape([(0, 0), (0, 1), (1, 1), (1, 2)])
+    public static let zH = shape([(0, 0), (1, 0), (1, 1), (2, 1)])
+    public static let zV = shape([(1, 0), (0, 1), (1, 1), (0, 2)])
+
+    // Artı (5 hücre)
+    public static let plus = shape([(1, 0), (0, 1), (1, 1), (2, 1), (1, 2)])
+
     // T şekilleri (4 hücre, 4 yön)
     public static let tA = shape([(0, 1), (1, 1), (2, 1), (1, 0)])
     public static let tB = shape([(0, 0), (1, 0), (2, 0), (1, 1)])
@@ -92,7 +101,9 @@ public enum PieceCatalog {
         square2, square3, rect2x3, rect3x2,
         cornerA, cornerB, cornerC, cornerD,
         bigLA, bigLB, bigLC, bigLD,
-        tA, tB, tC, tD
+        tA, tB, tC, tD,
+        sH, sV, zH, zV,
+        plus
     ]
 
     /// Parçaların geometrik eşleri: birlikte temiz dolgu yaparlar.
