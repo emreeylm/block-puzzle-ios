@@ -10,6 +10,8 @@ public enum BlockPattern: String, Equatable {
     case candy
     /// Işıldayan neon blok: dışa taşan hale + parlak kenarlar.
     case neon
+    /// Mat boyalı ahşap karo: damar dokusu + üstte açık, altta koyu kenar.
+    case wood
 }
 
 /// Tahta çerçevesinin çizim stili.
@@ -21,6 +23,8 @@ public enum FrameStyle: String, Equatable {
     case goldTrim
     /// İki renk arasında degrade yapan, dışa ışıyan neon çerçeve.
     case neonGlow
+    /// Oyulmuş kalın ahşap çerçeve: damar dokusu ve eğimli kenarlar.
+    case woodCarved
 }
 
 /// Tahta içindeki boş hücrelerin çizim stili.
@@ -29,6 +33,8 @@ public enum GridStyle: String, Equatable {
     case filledCells
     /// Yalnızca ince ızgara çizgileri ve kesişim noktaları çizilir.
     case lines
+    /// Hücreler ahşap damarlı, hafif oyulmuş kareler olarak çizilir.
+    case woodenCells
 }
 
 /// Bir görsel temanın veri tanımı. Render katmanı bu tanımı renklere/görsellere çevirir.
@@ -153,11 +159,15 @@ public enum SkinCatalog {
             id: "wood",
             name: "Ahşap",
             price: 400,
-            outerBackgroundHex: "#6D4C41",
-            boardBackgroundHex: "#33201C",
-            frameHex: "#26140F",
-            emptyCellHex: "#3E2723",
-            blockHexes: ["#D7863B", "#C0392B", "#E1B12C", "#27AE60", "#2980B9", "#8E44AD"]
+            outerBackgroundHex: "#4A2E1B",
+            boardBackgroundHex: "#2A1A10",
+            frameHex: "#8A5A32",
+            emptyCellHex: "#3A2416",
+            blockHexes: ["#E3A33C", "#8DC63F", "#E4703A", "#C0453A", "#4FA3A5", "#D8C57C"],
+            blockPattern: .wood,
+            frameStyle: .woodCarved,
+            gridStyle: .woodenCells,
+            cornerRadiusFactor: 0.18
         ),
         SkinDefinition(
             id: "midnight",

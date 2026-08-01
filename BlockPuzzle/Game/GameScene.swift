@@ -34,6 +34,7 @@ final class GameScene: SKScene {
     }
 
     private var drag: DragState?
+    private var backgroundNode: SKSpriteNode?
     private var lastGhostOrigin: GridPoint?
     private var blockTextureCache: [Int: SKTexture] = [:]
     private var highlightTextureCache: [Int: SKTexture] = [:]
@@ -97,6 +98,7 @@ final class GameScene: SKScene {
         lastGhostOrigin = nil
         ghostLayer.removeAllChildren()
         effectsLayer.removeAllChildren()
+        buildBackground()
         buildFrame(boardSide: boardSide)
         buildGrid()
         renderBoard()
@@ -123,6 +125,42 @@ final class GameScene: SKScene {
         cellSize * theme.cornerRadiusFactor
     }
 
+    /// Ahşap skinde ekran zemini düz renk yerine dikey plakalı tahta olur.
+    /// Sarsıntıdan etkilenmemesi için contentLayer'ın dışında durur.
+    private func buildBackground() {
+        backgroundNode?.removeFromParent()
+        backgroundNode = nil
+        guard theme.frameStyle == .woodCarved else { return }
+
+        let renderer = UIGraphicsImageRenderer(size: size)
+        let image = renderer.image { context in
+            let cg = context.cgContext
+            let rect = CGRect(origin: .zero, size: size)
+            cg.setFillColor(theme.outerBackground.cgColor)
+            cg.fill(rect)
+            drawWoodGrain(cg, in: rect, base: theme.outerBackground, lineCount: 90, seed: 0xF00D)
+
+            // Dikey plaka ayrımları
+            let plankWidth = size.width / 4
+            cg.setFillColor(SKColor.black.withAlphaComponent(0.22).cgColor)
+            var x = plankWidth
+            while x < size.width {
+                cg.fill(CGRect(x: x, y: 0, width: 2, height: size.height))
+                cg.setFillColor(theme.outerBackground.lightened(0.18).withAlphaComponent(0.35).cgColor)
+                cg.fill(CGRect(x: x + 2, y: 0, width: 1, height: size.height))
+                cg.setFillColor(SKColor.black.withAlphaComponent(0.22).cgColor)
+                x += plankWidth
+            }
+        }
+
+        let node = SKSpriteNode(texture: SKTexture(image: image))
+        node.size = size
+        node.position = CGPoint(x: size.width / 2, y: size.height / 2)
+        node.zPosition = -10
+        addChild(node)
+        backgroundNode = node
+    }
+
     private func buildFrame(boardSide: CGFloat) {
         frameLayer.removeAllChildren()
 
@@ -132,6 +170,7 @@ final class GameScene: SKScene {
         case .candyStripe: inset = 15; cornerRadius = 26
         case .goldTrim: inset = 11; cornerRadius = 16
         case .neonGlow: inset = 10; cornerRadius = 14
+        case .woodCarved: inset = 18; cornerRadius = 24
         case .plain: inset = 8; cornerRadius = 8
         }
 
@@ -177,6 +216,13 @@ final class GameScene: SKScene {
             inner.lineWidth = 1
             frameLayer.addChild(inner)
 
+        case .woodCarved:
+            addFrameSprite(makeWoodFrameTexture(
+                size: rect.size,
+                thickness: inset,
+                cornerRadius: cornerRadius
+            ), in: rect)
+
         case .neonGlow:
             // Hale taşması için doku çerçeveden geniş üretilir
             let bleed = inset * 2.4
@@ -195,6 +241,65 @@ final class GameScene: SKScene {
         sprite.size = rect.size
         sprite.position = CGPoint(x: rect.midX, y: rect.midY)
         frameLayer.addChild(sprite)
+    }
+
+    /// Oyulmuş ahşap çerçeve: damarlı kalın halka, dışta açık ve içte koyu
+    /// kenarla kabartma hissi verir.
+    private func makeWoodFrameTexture(
+        size: CGSize,
+        thickness: CGFloat,
+        cornerRadius: CGFloat
+    ) -> SKTexture {
+        let renderer = UIGraphicsImageRenderer(size: size)
+        let image = renderer.image { context in
+            let cg = context.cgContext
+            let outerRect = CGRect(origin: .zero, size: size)
+            let innerRect = outerRect.insetBy(dx: thickness, dy: thickness)
+            let innerRadius = max(2, cornerRadius - thickness * 0.6)
+
+            let ring = UIBezierPath(roundedRect: outerRect, cornerRadius: cornerRadius)
+            ring.append(UIBezierPath(roundedRect: innerRect, cornerRadius: innerRadius))
+            ring.usesEvenOddFillRule = true
+
+            cg.saveGState()
+            cg.addPath(ring.cgPath)
+            cg.clip(using: .evenOdd)
+
+            cg.setFillColor(theme.frame.cgColor)
+            cg.fill(outerRect)
+            drawWoodGrain(cg, in: outerRect, base: theme.frame, lineCount: 40, seed: 0x5EED)
+
+            // Üstten gelen ışık: çerçevenin üst yarısı hafif aydınlık
+            if let gradient = CGGradient(
+                colorsSpace: CGColorSpaceCreateDeviceRGB(),
+                colors: [
+                    SKColor.white.withAlphaComponent(0.14).cgColor,
+                    SKColor.clear.cgColor,
+                    SKColor.black.withAlphaComponent(0.22).cgColor
+                ] as CFArray,
+                locations: [0, 0.5, 1]
+            ) {
+                cg.drawLinearGradient(
+                    gradient,
+                    start: CGPoint(x: 0, y: 0),
+                    end: CGPoint(x: 0, y: size.height),
+                    options: []
+                )
+            }
+            cg.restoreGState()
+
+            // Dış kenarda açık, iç kenarda koyu hat → oyulmuş görünüm
+            cg.addPath(UIBezierPath(roundedRect: outerRect.insetBy(dx: 1, dy: 1), cornerRadius: cornerRadius).cgPath)
+            cg.setStrokeColor(theme.frame.lightened(0.35).cgColor)
+            cg.setLineWidth(2)
+            cg.strokePath()
+
+            cg.addPath(UIBezierPath(roundedRect: innerRect, cornerRadius: innerRadius).cgPath)
+            cg.setStrokeColor(theme.frame.darkened(0.55).cgColor)
+            cg.setLineWidth(3)
+            cg.strokePath()
+        }
+        return SKTexture(image: image)
     }
 
     /// Neon çerçeve: camgöbeğinden magentaya degrade yapan, dışa ışıyan hat.
@@ -326,6 +431,18 @@ final class GameScene: SKScene {
                 }
             }
 
+        case .woodenCells:
+            // Tek bir damarlı hücre dokusu üretilip tüm hücrelerde kullanılır
+            let texture = makeWoodCellTexture()
+            for y in 0..<boardSize {
+                for x in 0..<boardSize {
+                    let cell = SKSpriteNode(texture: texture)
+                    cell.size = CGSize(width: cellSize - 2, height: cellSize - 2)
+                    cell.position = cellCenter(GridPoint(x: x, y: y))
+                    gridLayer.addChild(cell)
+                }
+            }
+
         case .lines:
             let side = cellSize * CGFloat(boardSize)
             let lineColor = theme.emptyCell.withAlphaComponent(0.75)
@@ -368,6 +485,33 @@ final class GameScene: SKScene {
         }
     }
 
+    /// Boş ahşap hücre: damarlı, kenarları içe gölgeli (oyulmuş) kare.
+    private func makeWoodCellTexture() -> SKTexture {
+        let s = GameScene.blockCanvas
+        let radius = s * theme.cornerRadiusFactor * 0.5
+
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: s, height: s))
+        let image = renderer.image { context in
+            let cg = context.cgContext
+            let rect = CGRect(x: 0, y: 0, width: s, height: s)
+
+            cg.saveGState()
+            cg.addPath(UIBezierPath(roundedRect: rect, cornerRadius: radius).cgPath)
+            cg.clip()
+            cg.setFillColor(theme.emptyCell.cgColor)
+            cg.fill(rect)
+            drawWoodGrain(cg, in: rect, base: theme.emptyCell, lineCount: 10, seed: 0xCE11)
+
+            // İçe gölge: üstte koyu, altta hafif açık → oyuk hissi
+            cg.setFillColor(SKColor.black.withAlphaComponent(0.28).cgColor)
+            cg.fill(CGRect(x: 0, y: 0, width: s, height: s * 0.08))
+            cg.setFillColor(theme.emptyCell.lightened(0.22).withAlphaComponent(0.5).cgColor)
+            cg.fill(CGRect(x: 0, y: s * 0.93, width: s, height: s * 0.07))
+            cg.restoreGState()
+        }
+        return SKTexture(image: image)
+    }
+
     /// Blok dokusu, renk indeksine göre önbelleklenir.
     private func blockTexture(colorIndex: Int) -> SKTexture {
         if let cached = blockTextureCache[colorIndex] { return cached }
@@ -399,8 +543,76 @@ final class GameScene: SKScene {
         switch theme.pattern {
         case .candy: return makeCandyBlockTexture(base: base)
         case .neon: return makeNeonBlockTexture(base: base)
+        case .wood: return makeWoodBlockTexture(base: base)
         default: return makeBevelBlockTexture(base: base)
         }
+    }
+
+    /// Ahşap damarı: yatay, düzensiz genişlikte açık/koyu şeritler.
+    /// Tohum sabit verilir ki doku her üretimde aynı çıksın.
+    private func drawWoodGrain(
+        _ cg: CGContext,
+        in rect: CGRect,
+        base: SKColor,
+        lineCount: Int,
+        seed: UInt64
+    ) {
+        var rng = SeededGenerator(seed: seed)
+        for _ in 0..<lineCount {
+            let y = rect.minY + CGFloat.random(in: 0...1, using: &rng) * rect.height
+            let thickness = CGFloat.random(in: 0.4...2.4, using: &rng)
+            let isDark = Bool.random(using: &rng)
+            let alpha = CGFloat.random(in: 0.05...0.16, using: &rng)
+            let tint = isDark ? base.darkened(0.55) : base.lightened(0.45)
+            cg.setFillColor(tint.withAlphaComponent(alpha).cgColor)
+            cg.fill(CGRect(x: rect.minX, y: y, width: rect.width, height: thickness))
+        }
+    }
+
+    /// Ahşap blok: mat boyalı karo — üstte açık, altta koyu kenar, hafif damar.
+    private func makeWoodBlockTexture(base: SKColor) -> SKTexture {
+        let s = GameScene.blockCanvas
+        let radius = s * theme.cornerRadiusFactor
+        let edge = s * 0.09
+
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: s, height: s))
+        let image = renderer.image { context in
+            let cg = context.cgContext
+            let body = CGRect(x: 1, y: 1, width: s - 2, height: s - 2)
+
+            // Gövde: yukarıdan aşağıya hafif degrade
+            cg.saveGState()
+            cg.addPath(UIBezierPath(roundedRect: body, cornerRadius: radius).cgPath)
+            cg.clip()
+            if let gradient = CGGradient(
+                colorsSpace: CGColorSpaceCreateDeviceRGB(),
+                colors: [base.lightened(0.16).cgColor, base.darkened(0.1).cgColor] as CFArray,
+                locations: [0, 1]
+            ) {
+                cg.drawLinearGradient(
+                    gradient,
+                    start: CGPoint(x: body.midX, y: body.minY),
+                    end: CGPoint(x: body.midX, y: body.maxY),
+                    options: []
+                )
+            }
+
+            drawWoodGrain(cg, in: body, base: base, lineCount: 14, seed: 0xB10C)
+
+            // Üstte açık, altta koyu kenar (boyalı karo kalınlığı)
+            cg.setFillColor(base.lightened(0.4).withAlphaComponent(0.85).cgColor)
+            cg.fill(CGRect(x: body.minX, y: body.minY, width: body.width, height: edge * 0.55))
+            cg.setFillColor(base.darkened(0.35).withAlphaComponent(0.9).cgColor)
+            cg.fill(CGRect(x: body.minX, y: body.maxY - edge * 0.7, width: body.width, height: edge * 0.7))
+            cg.restoreGState()
+
+            // Koyu dış hat
+            cg.addPath(UIBezierPath(roundedRect: body, cornerRadius: radius).cgPath)
+            cg.setStrokeColor(base.darkened(0.5).cgColor)
+            cg.setLineWidth(s * 0.03)
+            cg.strokePath()
+        }
+        return SKTexture(image: image)
     }
 
     /// Neon tüp bloğu: koyu iç gövde, içeriden ışıyan renk, çift parlak hat
@@ -687,7 +899,7 @@ final class GameScene: SKScene {
             }
             cg.restoreGState()
 
-        case .candy, .neon:
+        case .candy, .neon, .wood:
             // Bu stillerin kendi doku üreticileri var
             break
 
