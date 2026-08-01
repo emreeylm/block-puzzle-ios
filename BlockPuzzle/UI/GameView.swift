@@ -41,7 +41,7 @@ struct GameView: View {
             } label: {
                 Image(systemName: "house.fill")
                     .font(.title3)
-                    .foregroundStyle(.white.opacity(0.8))
+                    .foregroundStyle(skin.textColor.opacity(0.8))
                     .padding(10)
                     .background(Color(hex: skin.boardBackgroundHex).opacity(0.6))
                     .clipShape(Circle())
@@ -52,12 +52,12 @@ struct GameView: View {
             VStack(spacing: 2) {
                 Text("\(model.score)")
                     .font(.system(size: 34, weight: .black, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(skin.textColor)
                     .contentTransition(.numericText())
                     .animation(.snappy, value: model.score)
                 Text("REKOR \(model.highScore)")
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.55))
+                    .foregroundStyle(skin.textColor.opacity(0.55))
             }
 
             Spacer()
@@ -79,7 +79,7 @@ struct GameView: View {
             VStack(spacing: 18) {
                 Text("Oyun Bitti!")
                     .font(.system(size: 32, weight: .black, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(skin.textColor)
 
                 if model.isNewHighScore {
                     Text("🏆 Yeni Rekor!")
@@ -90,14 +90,14 @@ struct GameView: View {
                 VStack(spacing: 6) {
                     Text("Skor: \(model.score)")
                         .font(.system(size: 24, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(skin.textColor)
                     HStack(spacing: 6) {
                         Text("+\(model.lastEarnedCoins)")
                         CoinIcon(size: 17)
                         Text("kazandın")
                     }
                     .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.85))
+                    .foregroundStyle(skin.textColor.opacity(0.85))
                 }
 
                 VStack(spacing: 12) {
@@ -121,7 +121,7 @@ struct GameView: View {
                             .frame(maxWidth: 220)
                             .padding(.vertical, 12)
                             .background(Color(hex: skin.frameHex))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(skin.textColor)
                             .clipShape(RoundedRectangle(cornerRadius: 16))
                     }
                 }

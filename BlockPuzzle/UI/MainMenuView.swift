@@ -38,7 +38,7 @@ struct MainMenuView: View {
                 }
                 Text("BLOCK PUZZLE")
                     .font(.system(size: 36, weight: .black, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(skin.textColor)
 
                 statCard(title: "REKOR", value: "\(model.highScore)")
 
@@ -100,7 +100,7 @@ struct MainMenuView: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, 12)
             .background(Color(hex: skin.frameHex))
-            .foregroundStyle(.white)
+            .foregroundStyle(skin.textColor)
             .clipShape(RoundedRectangle(cornerRadius: 18))
         }
     }
@@ -109,10 +109,10 @@ struct MainMenuView: View {
         VStack(spacing: 4) {
             Text(title)
                 .font(.system(size: 13, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(skin.textColor.opacity(0.6))
             Text(value)
                 .font(.system(size: 22, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(skin.textColor)
         }
         .frame(width: 130)
         .padding(.vertical, 12)

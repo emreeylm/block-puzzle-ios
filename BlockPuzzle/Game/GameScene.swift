@@ -544,8 +544,87 @@ final class GameScene: SKScene {
         case .candy: return makeCandyBlockTexture(base: base)
         case .neon: return makeNeonBlockTexture(base: base)
         case .wood: return makeWoodBlockTexture(base: base)
+        case .dots: return makeDiceBlockTexture(base: base)
         default: return makeBevelBlockTexture(base: base)
         }
+    }
+
+    /// Zar bloğu: çok yuvarlak pastel küp, çapraz degrade ve beş beyaz nokta.
+    private func makeDiceBlockTexture(base: SKColor) -> SKTexture {
+        let s = GameScene.blockCanvas
+        let radius = s * theme.cornerRadiusFactor
+        let body = CGRect(x: 2, y: 2, width: s - 4, height: s - 4)
+
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: s, height: s))
+        let image = renderer.image { context in
+            let cg = context.cgContext
+
+            // Alt kenar: küpün kalınlığı
+            cg.setFillColor(base.darkened(0.28).cgColor)
+            cg.addPath(UIBezierPath(
+                roundedRect: body.offsetBy(dx: 0, dy: s * 0.035),
+                cornerRadius: radius
+            ).cgPath)
+            cg.fillPath()
+
+            cg.saveGState()
+            cg.addPath(UIBezierPath(roundedRect: body, cornerRadius: radius).cgPath)
+            cg.clip()
+
+            // Gövde: üst-soldan alt-sağa degrade
+            if let gradient = CGGradient(
+                colorsSpace: CGColorSpaceCreateDeviceRGB(),
+                colors: [base.lightened(0.3).cgColor, base.darkened(0.08).cgColor] as CFArray,
+                locations: [0, 1]
+            ) {
+                cg.drawLinearGradient(
+                    gradient,
+                    start: CGPoint(x: body.minX, y: body.minY),
+                    end: CGPoint(x: body.maxX, y: body.maxY),
+                    options: []
+                )
+            }
+
+            // Üst-solda yumuşak parlama
+            cg.setFillColor(SKColor.white.withAlphaComponent(0.22).cgColor)
+            cg.fillEllipse(in: CGRect(
+                x: body.minX - body.width * 0.1,
+                y: body.minY - body.height * 0.15,
+                width: body.width * 0.85,
+                height: body.height * 0.6
+            ))
+
+            // Zarın beş noktası (dört köşe + merkez)
+            let dotRadius = s * 0.088
+            let positions: [(Double, Double)] = [
+                (0.28, 0.28), (0.72, 0.28), (0.5, 0.5), (0.28, 0.72), (0.72, 0.72)
+            ]
+            for (fx, fy) in positions {
+                let center = CGPoint(
+                    x: body.minX + body.width * fx,
+                    y: body.minY + body.height * fy
+                )
+                // Noktanın altında ince gölge → hafif gömülü görünüm
+                cg.setFillColor(base.darkened(0.22).withAlphaComponent(0.55).cgColor)
+                cg.fillEllipse(in: CGRect(
+                    x: center.x - dotRadius, y: center.y - dotRadius + s * 0.012,
+                    width: dotRadius * 2, height: dotRadius * 2
+                ))
+                cg.setFillColor(SKColor.white.withAlphaComponent(0.96).cgColor)
+                cg.fillEllipse(in: CGRect(
+                    x: center.x - dotRadius, y: center.y - dotRadius,
+                    width: dotRadius * 2, height: dotRadius * 2
+                ))
+            }
+            cg.restoreGState()
+
+            // İnce koyu kontur
+            cg.addPath(UIBezierPath(roundedRect: body, cornerRadius: radius).cgPath)
+            cg.setStrokeColor(base.darkened(0.3).cgColor)
+            cg.setLineWidth(s * 0.022)
+            cg.strokePath()
+        }
+        return SKTexture(image: image)
     }
 
     /// Ahşap damarı: yatay, düzensiz genişlikte açık/koyu şeritler.
@@ -865,23 +944,6 @@ final class GameScene: SKScene {
         case .plain:
             break
 
-        case .dots:
-            cg.saveGState()
-            cg.clip(to: rect)
-            cg.setFillColor(base.lightened(0.45).cgColor)
-            let radius = rect.width * 0.12
-            let positions: [(CGFloat, CGFloat)] = [
-                (0.25, 0.25), (0.75, 0.25), (0.5, 0.5), (0.25, 0.75), (0.75, 0.75)
-            ]
-            for (fx, fy) in positions {
-                let center = CGPoint(x: rect.minX + rect.width * fx, y: rect.minY + rect.height * fy)
-                cg.fillEllipse(in: CGRect(
-                    x: center.x - radius, y: center.y - radius,
-                    width: radius * 2, height: radius * 2
-                ))
-            }
-            cg.restoreGState()
-
         case .stripes:
             cg.saveGState()
             cg.clip(to: rect)
@@ -899,7 +961,7 @@ final class GameScene: SKScene {
             }
             cg.restoreGState()
 
-        case .candy, .neon, .wood:
+        case .candy, .neon, .wood, .dots:
             // Bu stillerin kendi doku üreticileri var
             break
 

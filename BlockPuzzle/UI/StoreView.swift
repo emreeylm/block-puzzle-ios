@@ -42,7 +42,7 @@ struct StoreView: View {
         if !skins.isEmpty {
             Text(title)
                 .font(.system(size: 14, weight: .heavy, design: .rounded))
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(skin.textColor.opacity(0.6))
                 .padding(.top, 6)
             ForEach(skins) { item in
                 SkinRow(skin: item)
@@ -57,7 +57,7 @@ struct StoreView: View {
             } label: {
                 Image(systemName: "chevron.left")
                     .font(.title3.bold())
-                    .foregroundStyle(.white.opacity(0.8))
+                    .foregroundStyle(skin.textColor.opacity(0.8))
                     .padding(10)
                     .background(Color(hex: skin.boardBackgroundHex).opacity(0.6))
                     .clipShape(Circle())
@@ -67,7 +67,7 @@ struct StoreView: View {
 
             Text("MAĞAZA")
                 .font(.system(size: 22, weight: .black, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(skin.textColor)
 
             Spacer()
 
@@ -110,14 +110,14 @@ private struct SkinRow: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(skin.name)
                     .font(.system(size: 17, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(model.activeSkin.textColor)
                 if !isOwned {
                     HStack(spacing: 4) {
                         CoinIcon(size: 13)
                         Text("\(skin.price)")
                     }
                     .font(.system(size: 14, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(model.activeSkin.textColor.opacity(0.7))
                 }
             }
 
@@ -135,7 +135,7 @@ private struct SkinRow: View {
         if isActive {
             Text("Seçili")
                 .font(.system(size: 15, weight: .bold, design: .rounded))
-                .foregroundStyle(.white.opacity(0.5))
+                .foregroundStyle(model.activeSkin.textColor.opacity(0.5))
                 .padding(.horizontal, 18)
                 .padding(.vertical, 10)
                 .background(Color.white.opacity(0.1))
@@ -146,7 +146,7 @@ private struct SkinRow: View {
             } label: {
                 Text("Kullan")
                     .font(.system(size: 15, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(model.activeSkin.textColor)
                     .padding(.horizontal, 18)
                     .padding(.vertical, 10)
                     .background(Color(hex: model.activeSkin.frameHex))

@@ -77,6 +77,21 @@ extension Color {
     }
 }
 
+extension SkinDefinition {
+    /// Zemin açık renkliyse koyu, koyuysa beyaz metin. Skin'e ayrı bir alan
+    /// eklemek yerine parlaklıktan hesaplanır: yeni bir skin eklendiğinde
+    /// okunabilirlik kendiliğinden doğru çıkar.
+    var textColor: Color {
+        let background = SKColor(hex: outerBackgroundHex)
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        background.getRed(&r, green: &g, blue: &b, alpha: &a)
+        let luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
+        return luminance > 0.62
+            ? Color(uiColor: SKColor(hex: frameHex).darkened(0.45))
+            : .white
+    }
+}
+
 /// Aktif SkinDefinition'ın render katmanı için renklere çevrilmiş hali.
 struct SkinTheme {
     let outerBackground: SKColor

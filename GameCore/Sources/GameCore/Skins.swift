@@ -226,12 +226,13 @@ public enum SkinCatalog {
             id: "dots",
             name: "Puantiye",
             price: 750,
-            outerBackgroundHex: "#3FA98C",
-            boardBackgroundHex: "#0E2C24",
-            frameHex: "#081E18",
-            emptyCellHex: "#153A30",
-            blockHexes: ["#E8393B", "#FF8C1A", "#FFC93C", "#3BC43B", "#3F6BE8", "#9C4FE0"],
-            blockPattern: .dots
+            outerBackgroundHex: "#FAF2DF",
+            boardBackgroundHex: "#EDE0C4",
+            frameHex: "#D3BC93",
+            emptyCellHex: "#E3D3B0",
+            blockHexes: ["#F27DA5", "#4C9BE8", "#A3D054", "#F5D23C", "#B07FE0", "#5BD2C8"],
+            blockPattern: .dots,
+            cornerRadiusFactor: 0.28
         ),
         SkinDefinition(
             id: "stripes",
